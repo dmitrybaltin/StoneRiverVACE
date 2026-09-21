@@ -63,40 +63,29 @@ Default inference parameters:
 - UniPC scheduler, `flow_shift=3.0` for 480p
 - 16 fps output
 
-## Create the Hugging Face Space once
+## Public Hugging Face deployment
 
-1. On Hugging Face, create a new **Gradio** Space. A practical name is `StoneRiverVACE`.
-2. Choose **ZeroGPU** hardware in the Space settings. A free personal account in good standing can currently host up to two ZeroGPU Spaces; otherwise use the hardware available to your HF account.
-3. The Space can start empty. Do not manually copy the code; GitHub Actions will push this repository to it.
-4. Create a Hugging Face user access token with **write** access to that Space/repository.
+The public Space is fixed to `DmitryBaltin/VCExperiment`.
 
-If the model download makes the first boot slow, keep `startup_duration_timeout: 1h` in this README. The model is public and does not require an HF token for inference downloads.
+The GitHub repository is **not mirrored** to Hugging Face. The workflow `.github/workflows/sync-to-huggingface.yml` builds a clean temporary directory containing only this whitelist:
+
+- `app.py`
+- `requirements.txt`
+- `.hf/README.md`, published as `README.md`
+
+It validates the exact file list, rejects the deployment if the public tree contains the string `StoneRiver`, initializes a new Git repository, creates one root deployment commit, and force-pushes that clean branch to the Space.
+
+Therefore GitHub history, `.github`, this internal README, `.gitignore`, and every non-whitelisted file stay out of the public Space.
 
 ## Configure GitHub once
 
-In `StoneRiverVACE` → **Settings → Secrets and variables → Actions** add:
+In **Settings → Secrets and variables → Actions**, only one secret is required:
 
-### Secret
+- `HF_TOKEN` — a Hugging Face token with write permission to `DmitryBaltin/VCExperiment`.
 
-- `HF_TOKEN` — Hugging Face token with write permission to the target Space.
+The destination Space id is hardcoded in the workflow; `HF_USERNAME` and `HF_SPACE_ID` are no longer used.
 
-### Variables
-
-- `HF_USERNAME` — the Hugging Face username that owns the token.
-- `HF_SPACE_ID` — full Space id, for example `your-hf-user/StoneRiverVACE`.
-
-The workflow is `.github/workflows/sync-to-huggingface.yml`. Every push to GitHub `main` force-pushes the same commit history to the Space `main` branch. Hugging Face automatically rebuilds/restarts the Space after the push.
-
-You can also trigger the workflow manually from **GitHub → Actions → Sync to Hugging Face Space → Run workflow**.
-
-## What must be done manually exactly once
-
-- Create the HF Space and select ZeroGPU hardware.
-- Create the HF write token.
-- Add `HF_TOKEN`, `HF_USERNAME`, and `HF_SPACE_ID` to GitHub Actions settings.
-- Run the workflow once manually if you do not want to wait for the next push.
-
-After that, normal development is only GitHub commits/pushes to `main`; deployment to Hugging Face is automatic.
+Every push to GitHub `main` deploys a fresh one-commit public runtime tree automatically. The workflow can also be run manually from GitHub Actions.
 
 ## Local run (optional)
 
