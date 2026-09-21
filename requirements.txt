@@ -1,0 +1,13 @@
+# ZeroGPU provides a compatible CUDA-enabled PyTorch runtime.
+gradio==6.26.0
+spaces
+diffusers==0.40.0
+transformers>=4.49.0,<6
+accelerate>=1.7.0
+huggingface_hub>=0.34.0,<2
+sentencepiece
+ftfy
+imageio
+imageio-ffmpeg
+Pillow
+numpy
